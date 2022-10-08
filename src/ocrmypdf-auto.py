@@ -414,20 +414,13 @@ class AutoOcrScheduler(object):
         return False
 
     def _map_output_path(self, input_path):
-        if self.output_mode == AutoOcrScheduler.MIRROR_TREE:
-            return self.output_dir / (input_path - self.input_dir)
-        else:
-            assert self.output_mode == AutoOcrScheduler.SINGLE_FOLDER
-            output_path = self.output_dir / (input_path.name)
-            unique = 1
-            if output_path.exists() or output_path in self.current_outputs:
-                suffix = '.{}.{}{}'.format(datetime.now().strftime('%Y%m%d'), unique, output_path.suffix)
-                output_path = output_path.with_suffix(suffix)
-
-            while output_path.exists() or output_path in self.current_outputs:
-                unique = unique + 1
-                output_path = output_path.with_suffix('.{}{}'.format(unique, output_path.suffix), depth=2)
-            return output_path
+        output_path = self.output_dir / (input_path.name)
+        unique = 1
+        suffix = '.{}.{}{}'.format(datetime.now().strftime('%Y%m%d'), unique, output_path.suffix)
+        while output_path.exists() or output_path in self.current_outputs:
+            unique = unique + 1
+            output_path = output_path.with_suffix('.{}{}'.format(unique, output_path.suffix), depth=2)
+        return output_path
 
     def _map_archive_path(self, input_path):
         return self.archive_dir / (input_path - self.input_dir)
